@@ -84,7 +84,12 @@ public class IndividualPCP {
 	}
   	
 	
+	boolean setDimLock = false;
+	
 	public void setDimensionCliques(ArrayList<ArrayList> list) {
+		if(setDimLock == true) return;
+		setDimLock = true;
+		
 		cliques = list;
 		drawndims = new ArrayList<ArrayList>();
 		if(cliques == null || cliques.size() <= 0) {
@@ -100,8 +105,10 @@ public class IndividualPCP {
 				}
 				dims = NumericDimensionReorderer.reorder(dims);
 				drawndims.add(dims);
-			}
+			}	
 		}
+		
+		setDimLock = false;
 	}
 	
 	
@@ -124,6 +131,7 @@ public class IndividualPCP {
 	
 	void drawSinglePCP() {
 		ArrayList<OneNumeric> dimensions = new ArrayList<OneNumeric>();
+		if(drawndims.size() <= 0) return;
 		
 		double shift1[] = {0.0, 0.0};
 		double scale[] = {1.0, 1.0};
@@ -155,39 +163,56 @@ public class IndividualPCP {
 		
 		double scale[] = new double[2];
 		
-		if(drawndims.size() <= 2) {
-			for(int i = 0; i < 2; i++) {
-				ArrayList clique = drawndims.get(i);
+		ArrayList<ArrayList> drawndims2 = new ArrayList<ArrayList>();
+		ArrayList<int[]> idlist = new ArrayList<int[]>();
+		for(int i = 0; i < drawndims.size(); i++) {
+			ArrayList clique = drawndims.get(i);
+			if(clique != null && clique.size() >= 2) {
+				drawndims2.add(clique);
+				int id[] = new int[1];
+				id[0] = i;
+				idlist.add(id);
+			}
+		}
+		
+		if(drawndims2.size() <= 2) {
+			for(int i = 0; i < drawndims2.size(); i++) {
+				ArrayList clique = drawndims2.get(i);
+				int cid[] = idlist.get(i);
 				scale[0] = 1.0;    scale[1] = 0.5;
-				drawComponentPCP(clique, shift2[i], scale, i);
+				drawComponentPCP(clique, shift2[i], scale, cid[0]);
 			}
 		}
-		else if(drawndims.size() <= 4) {
-			for(int i = 0; i < drawndims.size(); i++) {
-				ArrayList clique = drawndims.get(i);
+		else if(drawndims2.size() <= 4) {
+			for(int i = 0; i < drawndims2.size(); i++) {
+				ArrayList clique = drawndims2.get(i);
+				int cid[] = idlist.get(i);
 				scale[0] = scale[1] = 0.5;
-				drawComponentPCP(clique, shift4[i], scale, i);
+				drawComponentPCP(clique, shift4[i], scale, cid[0]);
 			}
 		}
-		else if(drawndims.size() <= 6) {
-			for(int i = 0; i < drawndims.size(); i++) {
-				ArrayList clique = drawndims.get(i);
+		else if(drawndims2.size() <= 6) {
+			for(int i = 0; i < drawndims2.size(); i++) {
+				ArrayList clique = drawndims2.get(i);
+				int cid[] = idlist.get(i);
 				scale[0] = 0.5;    scale[1] = 0.333333333;
-				drawComponentPCP(clique, shift6[i], scale, i);
+				drawComponentPCP(clique, shift6[i], scale, cid[0]);
 			}
 		}
-		else if(drawndims.size() <= 9) {
-			for(int i = 0; i < drawndims.size(); i++) {
-				ArrayList clique = drawndims.get(i);
+		else if(drawndims2.size() <= 9) {
+			for(int i = 0; i < drawndims2.size(); i++) {
+				ArrayList clique = drawndims2.get(i);
+				int cid[] = idlist.get(i);
 				scale[0] = scale[1] = 0.333333333;
-				drawComponentPCP(clique, shift9[i], scale, i);
+				drawComponentPCP(clique, shift9[i], scale, cid[0]);
 			}
 		}
 		else  {
 			for(int i = 0; i < 9; i++) {
-				ArrayList clique = drawndims.get(i);
+				ArrayList clique = drawndims2.get(i);
+				int cid[] = idlist.get(i);
 				scale[0] = scale[1] = 0.333333333;
-				drawComponentPCP(clique, shift9[i], scale, i);
+				drawComponentPCP(clique, shift9[i], scale, cid[0]);
 			}
 		}
 		

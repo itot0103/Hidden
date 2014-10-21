@@ -7,7 +7,7 @@ public class FeatureFileConverter {
 	static BufferedReader reader;
 	static BufferedWriter writer;
 
-	static String dirname = "C:/itot/projects/InfoVis/Hidden/data/LIDC/textureFeatures20140901/";
+	static String dirname = "C:/itot/projects/InfoVis/Hidden/data/LIDC/textureFeatures20140908/";
 	static String outfilename1 = "LIDCfeaturesNumericOnly.csv";
 	static String outfilename2 = "LIDCfeaturesWithDescription.csv";
 	static String descfilename = "tcia-diagnosis-data-2012-04-20.csv";

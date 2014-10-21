@@ -29,14 +29,41 @@ public class IndividualTextPanel extends JPanel {
 	}
 
 	
+	boolean setDimLock = false;
+	
 	public void updateDimensionInfo(ArrayList<ArrayList> dimlist) {
+		
+		if(iset.getDimSelectMode() == iset.DIMSELECT_CORRELATION) {
+			textArea.setText("");
+			textArea.copy();
+			return;
+		}
+		
+		if(setDimLock == true) return;
+		setDimLock = true;
+
 		if(dimlist == null) return;
 		String text = "";
+		boolean isCategory = false;
+		
+		int classId = iset.getClassId();
+		if(classId < 0 || classId >= (iset.getNumCategory() + iset.getNumBoolean()))
+			return;
+		if(classId < iset.getNumCategory()) 
+			isCategory = true;
+		
 		
 		// for each list of dimensions (corresponding to one PCP)
-		for(ArrayList list : dimlist) {
-			for(int i = 0; i < list.size(); i++) {
-				int[] numid = (int[])list.get(i);
+		for(int i = 0; i < dimlist.size(); i++) {
+			ArrayList list = dimlist.get(i);
+			String  cvalue = "";
+			if(isCategory == true)
+				cvalue = iset.categories.categories[classId][i];
+			else 
+				cvalue = (i == 0) ? "true" : "false";
+			text += "*** " + cvalue + "\n";
+			for(int j = 0; j < list.size(); j++) {
+				int[] numid = (int[])list.get(j);
 				text += (iset.getValueName(numid[0]) + '\n');
 			}
 			text += '\n';
@@ -44,7 +71,9 @@ public class IndividualTextPanel extends JPanel {
 		
 		textArea.setText(text);
 		textArea.copy();
-		System.out.println(text);
+		//System.out.println(text);
+	
+		setDimLock = false;
 	}
 
 	

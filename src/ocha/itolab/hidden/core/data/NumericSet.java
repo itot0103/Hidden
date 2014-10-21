@@ -3,6 +3,7 @@ package ocha.itolab.hidden.core.data;
 import java.util.ArrayList;
 
 public class NumericSet {
+	public String names[];
 	public ArrayList<OneNumeric> dimensions;
 	public double min[], max[];
 	
@@ -11,6 +12,13 @@ public class NumericSet {
 	 * Constructor
 	 */
 	public NumericSet(IndividualSet iset) {
+		
+		// Copy names
+		names = new String[iset.numNumeric];
+		for(int i = 0; i < names.length; i++) {
+			names[i] = iset.getValueName(i);
+		}
+		
 		dimensions = new ArrayList();
 		int counter = -1;
 		for(int i = 0; i < iset.numNumeric; i++) {

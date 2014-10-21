@@ -19,6 +19,10 @@ public class DimensionClassSeparativeness {
 		confidence = c;
 	}
 	
+	public static void setClassSupport(double s) {
+		support = s;
+	}
+	
 
 	/**
 	 * 
@@ -27,6 +31,7 @@ public class DimensionClassSeparativeness {
 		ArrayList<ArrayList> allsets = new ArrayList<ArrayList>();
 		iset = is;
 		classId = iset.getClassId();
+		iset.message = "";
 		
 		// if classId is invalid 
 		if(classId < 0 || classId >= (iset.getNumCategory() + iset.getNumBoolean()))
@@ -88,6 +93,19 @@ public class DimensionClassSeparativeness {
 		// for each class
 		for(int k = 0; k < numclass; k++) {
 			
+			// Class name definition
+			String classname1 = "";
+			if(classId < iset.getNumCategory()) 
+				classname1 = iset.categories.names[classId];
+			else
+				classname1 = iset.booleans.names[classId - iset.getNumCategory()];
+			String classname2 = "";		
+			if(classId < iset.getNumCategory()) 
+				classname2 = iset.categories.categories[classId][k];
+			else
+				classname2 = (k == 0) ? "false" : "true";
+			
+			// Array for counter
 			int counter2[][] = new int[iset.getNumNumeric()][];
 			for(int kk = 0; kk < counter2.length; kk++)
 				counter2[kk] = new int[NUMDIV];
@@ -111,12 +129,19 @@ public class DimensionClassSeparativeness {
 			
 			// for each numeric dimension
 			for(int j = 0; j < iset.getNumNumeric(); j++) {
+				String axisname = iset.getValueName(j);
+				
 				for(int jj = 0; jj < NUMDIV; jj++) {
 					double confratio = (double)counter2[j][jj] / (double)counter[j][jj];
 					
 					// if the k-th class occupies the large amount
 					// in the jj-th rank of the j-th dimension
 					if(confratio > confidence && counter2[j][jj] >= supnum) {
+						
+						double v1 = iset.numerics.min[j] - (iset.numerics.max[j] - iset.numerics.min[j]) * (double)jj / (double)NUMDIV;
+						double v2 = iset.numerics.min[j] - (iset.numerics.max[j] - iset.numerics.min[j]) * (double)(jj + 1) / (double)NUMDIV;
+						iset.message += axisname + " [" + v1 + "," + v2 + "] -> " + classname1 + ":" + classname2 + "\n";						
+						
 						ArrayList<int[]> set = allsets.get(k);
 						boolean already = false;
 						for(int jjj = 0; jjj < set.size(); jjj++) {
@@ -135,6 +160,10 @@ public class DimensionClassSeparativeness {
 			}
 			
 		}
+		
+		System.out.println("==========");
+		System.out.println(iset.message);
+		System.out.println("==========");
 		
 	}
 	

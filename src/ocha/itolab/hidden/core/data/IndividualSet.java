@@ -7,6 +7,7 @@ public class IndividualSet {
 	int numTotal, numNumeric, numCategory, numBoolean, classId, dimselectMode;
 	String name[];
 	public String filename;
+	public String message;
 	int type[];
 	ArrayList<OneIndividual> plots;
 	public NumericSet numerics;

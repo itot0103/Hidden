@@ -40,10 +40,54 @@ public class DimensionCliqueFinder {
         
 		CliqueFinder.findCliques(potential, candidates, already, connection, allcliques);
 		
+		postprocess(allcliques);
+		
 		return allcliques;
 	}
 
 	
 	
+	/**
+	 * Connect small cliques to other cliques if possible
+	 */
+	static void postprocess(ArrayList<ArrayList> allcliques) {
+
+		// for each clique
+		for(int i = 0; i < allcliques.size(); i++) {
+			ArrayList<int[]> clique1 = allcliques.get(i);
+			if(clique1.size() >= 3) continue;
+			
+			// for each other cliques
+			for(int j = 0; j < allcliques.size(); j++) {
+				if(i == j) continue;
+				ArrayList<int[]> clique2 = allcliques.get(j);
+				
+				int[] id1a = clique1.get(0);
+				int[] id1b = clique1.get(clique1.size() - 1);
+				int[] id2a = clique2.get(0);
+				int[] id2b = clique2.get(clique2.size() - 1);
+				
+				if(id1a[0] == id2a[0]) {
+					clique2.add(0, id1b); allcliques.remove(clique1);
+					i = -1;  break;
+				}
+				if(id1a[0] == id2b[0]) {
+					clique2.add(id1b); allcliques.remove(clique1);
+					i = -1;  break;
+				}
+				if(id1b[0] == id2a[0]) {
+					clique2.add(0, id1a); allcliques.remove(clique1);
+					i = -1;  break;
+				}
+				if(id1b[0] == id2b[0]) {
+					clique2.add(id1a); allcliques.remove(clique1);
+					i = -1;  break;
+				}
+			}
+			
+			
+		}		
+		
+	}
 
 }	   	

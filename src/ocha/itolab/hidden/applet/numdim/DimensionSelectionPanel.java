@@ -29,7 +29,7 @@ public class DimensionSelectionPanel extends JPanel {
 	IndividualTextPanel itext;
 	JTabbedPane pane = null;
 	
-	JSlider dimselectSlider;
+	JSlider slider1, slider2;
 	
 	/* Action listener */
 	ButtonListener bl = null;
@@ -48,8 +48,11 @@ public class DimensionSelectionPanel extends JPanel {
 		//this.add(pane);
 		
 		JPanel p1 = new JPanel();
-		dimselectSlider = new JSlider(JSlider.VERTICAL, 0, 100, 0);
-		p1.add(dimselectSlider);
+		p1.setLayout(new GridLayout(2,1));
+		slider1 = new JSlider(JSlider.VERTICAL, 0, 100, 0);
+		p1.add(slider1);
+		slider2 = new JSlider(JSlider.VERTICAL, 0, 100, 0);
+		p1.add(slider2);
 		
 		this.add(p1);
 
@@ -90,7 +93,8 @@ public class DimensionSelectionPanel extends JPanel {
 	
 
 	public void addSliderListener(ChangeListener changeListener) {
-		dimselectSlider.addChangeListener(changeListener);
+		slider1.addChangeListener(changeListener);
+		slider2.addChangeListener(changeListener);
 	}
 	
 
@@ -114,28 +118,37 @@ public class DimensionSelectionPanel extends JPanel {
 		}
 	}
 
-	static long now0 = 0;
+	static long now1 = 0, now2 = 0;
 	
 	
 	class SliderListener implements ChangeListener {
 		public void stateChanged(ChangeEvent e) {
 			JSlider sliderChanged = (JSlider) e.getSource();
-			if (sliderChanged == dimselectSlider) {
+			if (sliderChanged == slider1) {
 				if(ps == null) return;
 				
 				long now = System.currentTimeMillis();
-				now0 = now;
+				now1 = now;
 				
-				SliderThread st = new SliderThread(now);
-				st.start();
+				Slider1Thread st1 = new Slider1Thread(now);
+				st1.start();
+			}
+			if (sliderChanged == slider1) {
+				if(ps == null) return;
+				
+				long now = System.currentTimeMillis();
+				now2 = now;
+				
+				Slider2Thread st2 = new Slider2Thread(now);
+				st2.start();
 			}
 		}
 	}
 	
 	
-	class SliderThread extends Thread {
+	class Slider1Thread extends Thread {
 		long now;
-		SliderThread(long n) {
+		Slider1Thread(long n) {
              this.now = n;
         }
  
@@ -145,11 +158,11 @@ public class DimensionSelectionPanel extends JPanel {
         	 } catch(Exception e) {
         	 	e.printStackTrace();
         	 }
-        	 if(now != now0) return;
+        	 if(now != now1) return;
         	 
         	 if(ps.getDimSelectMode() == ps.DIMSELECT_CORRELATION) {
         		 
-        		 double edgeratio = (double)dimselectSlider.getValue() / 100.0;
+        		 double edgeratio = (double)slider1.getValue() / 100.0;
         		 ocanvas.setEdgeRatio(edgeratio);
         		 ocanvas.display();
 			
@@ -161,7 +174,7 @@ public class DimensionSelectionPanel extends JPanel {
         	 }
 				
         	 if(ps.getDimSelectMode() == ps.DIMSELECT_CLASS_PURELITY) {
-        		 double confidence = 1.0 - (double)dimselectSlider.getValue() / 500.0;
+        		 double confidence = 1.0 - (double)slider1.getValue() / 100.0;
         		 DimensionClassSeparativeness.setClassConfidence(confidence);
         		 ArrayList<ArrayList> cliques = DimensionClassSeparativeness.extract(ps);
         		 icanvas.setDimensionCliques(cliques);
@@ -172,6 +185,38 @@ public class DimensionSelectionPanel extends JPanel {
          }
 	}
 
+	
+	class Slider2Thread extends Thread {
+		long now;
+		Slider2Thread(long n) {
+             this.now = n;
+        }
+ 
+         public void run() {
+        	 try {
+        		 Thread.sleep(300);
+        	 } catch(Exception e) {
+        	 	e.printStackTrace();
+        	 }
+        	 if(now != now2) return;
+        	 
+        	 if(ps.getDimSelectMode() == ps.DIMSELECT_CORRELATION) {
+        		 
+        	 }
+				
+        	 if(ps.getDimSelectMode() == ps.DIMSELECT_CLASS_PURELITY) {
+        		 double support = 1.0 - (double)slider2.getValue() / 100.0;
+        		 DimensionClassSeparativeness.setClassSupport(support);
+        		 ArrayList<ArrayList> cliques = DimensionClassSeparativeness.extract(ps);
+        		 icanvas.setDimensionCliques(cliques);
+        		 itext.updateDimensionInfo(cliques);
+        		 icanvas.display();
+			}	
+			
+         }
+	}
+
+	
     class CheckBoxListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			icanvas.display();

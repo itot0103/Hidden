@@ -3,6 +3,7 @@ package ocha.itolab.hidden.core.data;
 import java.util.ArrayList;
 
 public class BooleanSet {
+	public String names[];
 	public ArrayList<OneBoolean> dimensions;
 	int numBoolean;
 	
@@ -10,6 +11,13 @@ public class BooleanSet {
 	 * Constructor
 	 */
 	public BooleanSet(IndividualSet iset) {
+
+		// Copy names
+		names = new String[iset.numBoolean];
+		for(int i = 0; i < names.length; i++) {
+			names[i] = iset.getValueName(i + iset.numNumeric + iset.numCategory);
+		}
+		
 		numBoolean = iset.numBoolean;
 		dimensions = new ArrayList();
 		int counter = -1;
