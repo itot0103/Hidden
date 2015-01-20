@@ -30,6 +30,7 @@ public class IndividualPCP {
 	double dsize = 1.5;
 	double transparency = 0.1;
 	int numclusters = 1;
+	float brightness = 0.75f;
 	ArrayList specifiedlist = null;
 	ArrayList<ArrayList> cliques = null;
 	ArrayList<ArrayList> drawndims = null;
@@ -64,8 +65,10 @@ public class IndividualPCP {
 		ArrayList<OneNumeric> alldims = new ArrayList<OneNumeric>();
 		for(int i = 0; i < ps.getNumNumeric(); i++) {
 			OneNumeric on = ps.numerics.dimensions.get(i);
+			if(on.getStatus() == on.STATUS_INVISIBLE) continue;
 			alldims.add(on);
 		}
+		System.out.println("  num.dimensions=" + alldims.size());
 		if(alldims.size() < 20)
 			alldims = NumericDimensionReorderer.reorder(alldims);
 		drawndims.add(alldims);
@@ -84,10 +87,12 @@ public class IndividualPCP {
 	}
   	
 	
-	boolean setDimLock = false;
+	static boolean setDimLock = false;
 	
 	public void setDimensionCliques(ArrayList<ArrayList> list) {
-		if(setDimLock == true) return;
+		if(setDimLock == true) {
+			return;
+		}
 		setDimLock = true;
 		
 		cliques = list;
@@ -103,15 +108,19 @@ public class IndividualPCP {
 					int id[] = oneclique.get(j);
 					dims.add(ps.numerics.dimensions.get(id[0]));
 				}
-				dims = NumericDimensionReorderer.reorder(dims);
+				//dims = NumericDimensionReorderer.reorder(dims);
 				drawndims.add(dims);
 			}	
 		}
-		
 		setDimLock = false;
 	}
 	
 	
+	public void unlockDisplay() {
+		setDimLock = false;
+	}
+
+
 	public void draw() {
 		if(ps == null) return;
 
@@ -219,6 +228,9 @@ public class IndividualPCP {
 	}
 
 	
+	/**
+	 * Draw One component of PCP (WITHOUT class specification)
+	 */
 	void drawComponentPCP(ArrayList<OneNumeric> dimensions, double shift[], double scale[], int cid) {	 
 		if(ps.getDimSelectMode() == ps.DIMSELECT_CLASS_PURELITY
 				&& ps.getClassId() >= 0 && cid >= 0) {
@@ -230,17 +242,20 @@ public class IndividualPCP {
 		
 		gl2.glColor3d(0.5, 0.5, 0.5);
 		for(int i = 0; i < dimensions.size(); i++) {
-			gl2.glBegin(GL.GL_LINES);
+			
 			double x = (double)i / (double)(dimensions.size() - 1);
 			x = x * dsize * 2.0 - dsize;
 			
 			double x0 = x * scale[0] + shift[0];
 			double y1 = -dsize * scale[1] + shift[1];
 			double y2 =  dsize * scale[1] + shift[1];
-			
-			gl2.glVertex3d(x0, y1, 0.0);
-			gl2.glVertex3d(x0, y2, 0.0);
+
+			gl2.glLineWidth(3.0f);
+			gl2.glBegin(GL.GL_LINES);
+			gl2.glVertex3d(x0, y1, -0.1);
+			gl2.glVertex3d(x0, y2, -0.1);
 			gl2.glEnd();
+			gl2.glLineWidth(1.0f);
 			
 			OneNumeric on = dimensions.get(i);
 			int id = on.getId();
@@ -252,40 +267,18 @@ public class IndividualPCP {
 			writeOneString(x0, y5, df.format(ps.numerics.max[id]));
 		}	
 			
-		gl2.glColor4d(0.0, 0.0, 1.0, 0.1);
+		
 		for(int i = 0; i < ps.getNumIndividual(); i++) {
 			OneIndividual p = ps.getOneIndividual(i);
-			
-			if(numclusters >= 2) {
-				float hue = (float)p.getClusterId() / (float)numclusters;
-				Color color = Color.getHSBColor(hue, 1.0f, 1.0f);
-				double rr = (double)color.getRed() / 255.0;
-				double gg = (double)color.getGreen() / 255.0;
-				double bb = (double)color.getBlue() / 255.0;
-				gl2.glColor4d(rr, gg, bb, transparency);
-			}
-				
-			gl2.glBegin(GL.GL_LINE_STRIP);
-			for(int j = 0; j < dimensions.size(); j++) {//draw the lines of a data
-				OneNumeric on = dimensions.get(j);
-				int id = on.getId();
-				
-				double x = (double)j / (double)(dimensions.size() - 1);
-				double numeric[] = p.getNumericValues();
-				double y = (numeric[id] - ps.numerics.min[id]) / (ps.numerics.max[id] - ps.numerics.min[id]);
-				x = x * dsize * 2.0 - dsize;
-				y = y * dsize * 2.0 - dsize;
-				x = x * scale[0] + shift[0];
-				y = y * scale[1] + shift[1];
-				gl2.glVertex3d(x,y, 0.0);	
-			}
-			
-			gl2.glEnd();
+			drawOnePolyline(p, dimensions, shift, scale, 1.0);
 		}
 		
 	}
 	
 	
+	/**
+	 * Draw One component of PCP (WITH class specification)
+	 */
 	void drawComponentPCPWithClassEmphasis(
 			ArrayList<OneNumeric> dimensions, double shift[], double scale[], int cid) {
 
@@ -294,17 +287,19 @@ public class IndividualPCP {
 		
 		gl2.glColor3d(0.5, 0.5, 0.5);
 		for(int i = 0; i < dimensions.size(); i++) {
-			gl2.glBegin(GL.GL_LINES);
+			
 			double x = (double)i / (double)(dimensions.size() - 1);
 			x = x * dsize * 2.0 - dsize;
-			
 			double x0 = x * scale[0] + shift[0];
 			double y1 = -dsize * scale[1] + shift[1];
 			double y2 =  dsize * scale[1] + shift[1];
 			
+			gl2.glLineWidth(3.0f);
+			gl2.glBegin(GL.GL_LINES);
 			gl2.glVertex3d(x0, y1, 0.0);
 			gl2.glVertex3d(x0, y2, 0.0);
 			gl2.glEnd();
+			gl2.glLineWidth(1.0f);
 			
 			OneNumeric on = dimensions.get(i);
 			int id = on.getId();
@@ -319,66 +314,60 @@ public class IndividualPCP {
 		gl2.glColor4d(0.0, 0.0, 1.0, 0.1);
 		
 		if(numclusters >= 2) {
+			
 			for(int i = 0; i < ps.getNumIndividual(); i++) {
 				OneIndividual p = ps.getOneIndividual(i);
-				
 				if(p.getClusterId() == cid) continue;
-				float hue = (float)p.getClusterId() / (float)numclusters;
-				Color color = Color.getHSBColor(hue, 1.0f, 1.0f);
-				double rr = (double)color.getRed() / 255.0;
-				double gg = (double)color.getGreen() / 255.0;
-				double bb = (double)color.getBlue() / 255.0;
-				gl2.glColor4d(rr, gg, bb, transparency * 0.25);
-				
-				gl2.glBegin(GL.GL_LINE_STRIP);
-				for(int j = 0; j < dimensions.size(); j++) {//draw the lines of a data
-					OneNumeric on = dimensions.get(j);
-					int id = on.getId();
-				
-					double x = (double)j / (double)(dimensions.size() - 1);
-					double numeric[] = p.getNumericValues();
-					double y = (numeric[id] - ps.numerics.min[id]) / (ps.numerics.max[id] - ps.numerics.min[id]);
-					x = x * dsize * 2.0 - dsize;
-					y = y * dsize * 2.0 - dsize;
-					x = x * scale[0] + shift[0];
-					y = y * scale[1] + shift[1];
-					gl2.glVertex3d(x,y, 0.0);	
-				}
+				drawOnePolyline(p, dimensions, shift, scale, 0.25);
 			}
-		}
-		
-		for(int i = 0; i < ps.getNumIndividual(); i++) {
-			OneIndividual p = ps.getOneIndividual(i);
 			
-			if(numclusters >= 2) {
+			for(int i = 0; i < ps.getNumIndividual(); i++) {
+				OneIndividual p = ps.getOneIndividual(i);
 				if(p.getClusterId() != cid) continue;
-				float hue = (float)p.getClusterId() / (float)numclusters;
-				Color color = Color.getHSBColor(hue, 1.0f, 1.0f);
-				double rr = (double)color.getRed() / 255.0;
-				double gg = (double)color.getGreen() / 255.0;
-				double bb = (double)color.getBlue() / 255.0;
-				gl2.glColor4d(rr, gg, bb, transparency);
+				drawOnePolyline(p, dimensions, shift, scale, 1.0);
 			}
-			
-			gl2.glBegin(GL.GL_LINE_STRIP);
-			for(int j = 0; j < dimensions.size(); j++) {//draw the lines of a data
-				OneNumeric on = dimensions.get(j);
-				int id = on.getId();
-					
-				double x = (double)j / (double)(dimensions.size() - 1);
-				double numeric[] = p.getNumericValues();
-				double y = (numeric[id] - ps.numerics.min[id]) / (ps.numerics.max[id] - ps.numerics.min[id]);
-				x = x * dsize * 2.0 - dsize;
-				y = y * dsize * 2.0 - dsize;
-				x = x * scale[0] + shift[0];
-				y = y * scale[1] + shift[1];
-				gl2.glVertex3d(x,y, 0.0);	
-			}
-			
-			gl2.glEnd();
 		}		
 		
 	}
+	
+	
+	/**
+	@* Draw one polyline in the PCP
+	 */
+	void drawOnePolyline(OneIndividual p, ArrayList<OneNumeric> dimensions,
+			double shift[], double scale[], double tratio) {
+	
+		
+		if(numclusters == 1 && ps.getDimSelectMode() == ps.DIMSELECT_CORRELATION)
+			gl2.glColor4d(0.0, 0.0, 1.0, transparency);
+		else {
+			float hue = (float)p.getClusterId() / (float)numclusters;
+			Color color = Color.getHSBColor(hue, 1.0f, brightness);
+			double rr = (double)color.getRed() / 255.0;
+			double gg = (double)color.getGreen() / 255.0;
+			double bb = (double)color.getBlue() / 255.0;
+			gl2.glColor4d(rr, gg, bb, transparency * tratio);
+		}
+		
+		
+		gl2.glBegin(GL.GL_LINE_STRIP);
+		for(int j = 0; j < dimensions.size(); j++) {//draw the lines of a data
+			OneNumeric on = dimensions.get(j);
+			int id = on.getId();
+	
+			double x = (double)j / (double)(dimensions.size() - 1);
+			double numeric[] = p.getNumericValues();
+			double y = (numeric[id] - ps.numerics.min[id]) / (ps.numerics.max[id] - ps.numerics.min[id]);
+			x = x * dsize * 2.0 - dsize;
+			y = y * dsize * 2.0 - dsize;
+			x = x * scale[0] + shift[0];
+			y = y * scale[1] + shift[1];
+			gl2.glVertex3d(x,y, 0.0);	
+		}
+		gl2.glEnd();
+	}	
+	
+	
 	
 	void writeOneString(double x, double y, String word) {
 		gl2.glRasterPos3d(x, y, 0.0);

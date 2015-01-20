@@ -13,6 +13,7 @@ public class DimensionClassSeparativeness {
 	static double confidence = 0.1;
 	static IndividualSet iset = null;
 	static int classId = -1, numclass = 0;
+	static boolean visiblearray[];
 	
 	
 	public static void setClassConfidence(double c) {
@@ -48,6 +49,13 @@ public class DimensionClassSeparativeness {
 		else if(classId < (iset.getNumCategory() + iset.getNumBoolean()))
 			numclass = 2;
 
+		// Reset the visible arrray
+		visiblearray = new boolean[iset.getNumNumeric()];
+		for(int i = 0; i < iset.getNumNumeric(); i++) {
+			OneNumeric on = iset.numerics.dimensions.get(i);
+			visiblearray[i] = (on.getStatus() == on.STATUS_INVISIBLE) ? false : true;
+		}
+		
 		// Extract corresponding dimensions for each class 
 		for(int i = 0; i < numclass; i++) {
 			ArrayList<OneNumeric> list = new ArrayList<OneNumeric>();
@@ -80,6 +88,7 @@ public class DimensionClassSeparativeness {
 			
 			// for each numeric dimension
 			for(int j = 0; j < iset.getNumNumeric(); j++) {
+				if(visiblearray[j] == false) continue;
 				double v = (numeric[j] - iset.numerics.min[j]) / (iset.numerics.max[j] - iset.numerics.min[j]);
 				int id = (int)(v * (double)NUMDIV);
 				id = (id < 0) ? 0 : id;
@@ -119,6 +128,7 @@ public class DimensionClassSeparativeness {
 				
 				// for each numeric dimension
 				for(int j = 0; j < iset.getNumNumeric(); j++) {
+					if(visiblearray[j] == false) continue;
 					double v = (numeric[j] - iset.numerics.min[j]) / (iset.numerics.max[j] - iset.numerics.min[j]);
 					int id = (int)(v * (double)NUMDIV);
 					id = (id < 0) ? 0 : id;
@@ -129,6 +139,7 @@ public class DimensionClassSeparativeness {
 			
 			// for each numeric dimension
 			for(int j = 0; j < iset.getNumNumeric(); j++) {
+				if(visiblearray[j] == false) continue;
 				String axisname = iset.getValueName(j);
 				
 				for(int jj = 0; jj < NUMDIV; jj++) {
@@ -140,7 +151,8 @@ public class DimensionClassSeparativeness {
 						
 						double v1 = iset.numerics.min[j] - (iset.numerics.max[j] - iset.numerics.min[j]) * (double)jj / (double)NUMDIV;
 						double v2 = iset.numerics.min[j] - (iset.numerics.max[j] - iset.numerics.min[j]) * (double)(jj + 1) / (double)NUMDIV;
-						iset.message += axisname + " [" + v1 + "," + v2 + "] -> " + classname1 + ":" + classname2 + "\n";						
+						//iset.message += axisname + " [" + v1 + "," + v2 + "] -> " + classname1 + ":" + classname2 + "\n";						
+						iset.message += axisname + "\n";
 						
 						ArrayList<int[]> set = allsets.get(k);
 						boolean already = false;

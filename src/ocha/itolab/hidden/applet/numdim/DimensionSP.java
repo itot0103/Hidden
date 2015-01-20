@@ -72,20 +72,23 @@ public class DimensionSP {
 		model = m;
 		proj = p;
 		
+		gl2.glLineWidth(1.0f);
 		gl2.glColor3d(0.5, 0.5, 0.5);
-		gl2.glBegin(GL.GL_LINE_STRIP);
+		gl2.glBegin(GL.GL_LINE_LOOP);
 		gl2.glVertex3d(-1.0, 1.0, 0.0);
 		gl2.glVertex3d(-1.0, -1.0, 0.0);
 		gl2.glVertex3d(1.0, -1.0, 0.0);
+		gl2.glVertex3d(1.0, 1.0, 0.0);
 		gl2.glEnd();
 		
 		// Draw plots
 		gl2.glColor3d(0.0, 0.5, 0.5);
-		gl2.glPointSize(4.0f);
+		gl2.glPointSize(6.0f);
 		gl2.glBegin(GL.GL_POINTS);
 		ArrayList dims =  ps.numerics.dimensions;
 		for(int i = 0; i < dims.size(); i++) {
 			OneNumeric d = (OneNumeric)dims.get(i);
+			if(d.getStatus() == d.STATUS_INVISIBLE) continue;
 			double x = d.getX();
 			double y = d.getY();
 			gl2.glVertex3d(x, y, 0.0);
@@ -93,11 +96,14 @@ public class DimensionSP {
 		gl2.glEnd();
 		
 		// Draw edges
+		gl2.glLineWidth(1.0f);
 		gl2.glColor3d(0.7, 0.7, 0.7);
 		for(int i = 0; i < dims.size(); i++) {
 			OneNumeric d = (OneNumeric)dims.get(i);
+			if(d.getStatus() == d.STATUS_INVISIBLE) continue;
 			for(int j = (i + 1); j < dims.size(); j++) {
 				OneNumeric d2 = (OneNumeric)dims.get(j);
+				if(d2.getStatus() == d2.STATUS_INVISIBLE) continue;
 				double dissim = d.getDissimilarity(j);
 				if(dissim < edgeratio) {
 					gl2.glBegin(gl2.GL_LINES);
@@ -111,6 +117,7 @@ public class DimensionSP {
 		// Draw names of dimensions
 		for(int i = 0; i < dims.size(); i++) {
 			OneNumeric d = (OneNumeric)dims.get(i);
+			if(d.getStatus() == d.STATUS_INVISIBLE) continue;
 			double x = d.getX();
 			double y = d.getY();
 			writeOneString(x, y, ps.getValueName(i));
@@ -118,9 +125,7 @@ public class DimensionSP {
 	
 		// Draw rectangle
 		if(isRect == true) {
-			
 			double pos[] = specifyRectanglePosition3D();
-			
 			gl2.glColor3d(1.0, 0.0, 0.0);
 			gl2.glBegin(GL.GL_LINE_LOOP);
 			gl2.glVertex3d(pos[0], pos[2], 0.0);

@@ -31,7 +31,7 @@ public class IndividualSelectionPanel extends JPanel {
 	public JButton  fileOpenButton, viewResetButton, clusteringButton;
 	public JTextField numClusterField;
 	public JRadioButton correlationButton, separativenessButton;
-	public JSlider transparencySlider;
+	public JSlider transparencySlider, cullingSlider;
 	JTabbedPane pane = null;
 	
 	/* Action listener */
@@ -47,7 +47,7 @@ public class IndividualSelectionPanel extends JPanel {
 		
 		
 		JPanel p1 = new JPanel();
-		p1.setLayout(new GridLayout(8,1));
+		p1.setLayout(new GridLayout(10,1));
 		
 		fileOpenButton = new JButton("File Open");
 		p1.add(fileOpenButton);
@@ -56,6 +56,9 @@ public class IndividualSelectionPanel extends JPanel {
 		p1.add(new JLabel("Transparency"));
 		transparencySlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
 		p1.add(transparencySlider);
+		p1.add(new JLabel("Culling"));
+		cullingSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
+		p1.add(cullingSlider);
 		
 		JPanel p11 = new JPanel();
 		p11.setLayout(new GridLayout(1,2));
@@ -154,6 +157,7 @@ public class IndividualSelectionPanel extends JPanel {
 	
 	public void addSliderListener(ChangeListener changeListener) {
 		transparencySlider.addChangeListener(changeListener);
+		cullingSlider.addChangeListener(changeListener);
 	}
 	
 	
@@ -220,6 +224,13 @@ public class IndividualSelectionPanel extends JPanel {
 				double t = (double)transparencySlider.getValue() / 100.0;
 				icanvas.setTransparency(t);
 				icanvas.display();
+			}
+			if (sliderChanged == cullingSlider) {
+				double c = (double)cullingSlider.getValue() / 100.0;
+				DimensionCullingProcessor.setRatio(iset, c);
+				icanvas.setIndividualSet(iset);
+				icanvas.display();
+				ocanvas.display();
 			}
 		}
 	}

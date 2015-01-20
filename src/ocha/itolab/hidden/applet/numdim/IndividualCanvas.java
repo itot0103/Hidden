@@ -97,6 +97,11 @@ public class IndividualCanvas extends JPanel {
 		drawer.setTransparency(t);
 	}
 
+	
+	public void unlockDisplay() {
+		drawer.unlockDisplay();
+	}
+	
 	public void display() {
 		GLAutoDrawable glAD = drawer.getGLAutoDrawable();
 

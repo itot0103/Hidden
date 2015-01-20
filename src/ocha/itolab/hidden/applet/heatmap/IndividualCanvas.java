@@ -3,14 +3,19 @@ package ocha.itolab.hidden.applet.heatmap;
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
+
 import javax.imageio.ImageIO;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.awt.GLJPanel;
+
 import ocha.itolab.hidden.core.data.*;
+import ocha.itolab.hidden.core.tool.ClusteringResultEvaluator;
 
 public class IndividualCanvas extends JPanel {
 
@@ -86,6 +91,7 @@ public class IndividualCanvas extends JPanel {
 
 	public void setIndividualCliques(ArrayList<ArrayList> cliques) {
 		drawer.setIndividualCliques(cliques);
+		ClusteringResultEvaluator.evaluate(ps, cliques);
 	}
 
 	public void display() {

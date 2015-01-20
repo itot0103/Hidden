@@ -21,16 +21,21 @@ public class DimensionCliqueFinder {
         // Set ID of the numeric dimensions
         NumericSet ns = is.numerics;
         for(int i = 0; i < ns.getNumNumeric(); i++) {
+        	OneNumeric on = ns.dimensions.get(i);
+        	if(on.getStatus() == on.STATUS_INVISIBLE) 
+        		continue;
         	int id[] = new int[1];
         	id[0] = i;
         	candidates.add(id);
         }
         
         // Set connectivity between the numeric dimensions
-        for(int i = 0; i < ns.getNumNumeric(); i++) {
-        	OneNumeric on1 = ns.dimensions.get(i);
-        	for(int j = (i + 1);  j < ns.getNumNumeric(); j++) {
-        		if(on1.getDissimilarity(j) < edgeratio) {
+        for(int i = 0; i < candidates.size(); i++) {
+        	int id1[] = candidates.get(i);
+        	OneNumeric on1 = ns.dimensions.get(id1[0]);
+        	for(int j = (i + 1);  j < candidates.size(); j++) {
+        		int id2[] = candidates.get(j);
+        		if(on1.getDissimilarity(id2[0]) < edgeratio) {
         			int id[] = new int[2];
         			id[0] = i;    id[1] = j;
         			connection.add(id);

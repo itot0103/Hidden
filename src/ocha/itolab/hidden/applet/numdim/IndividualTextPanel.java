@@ -18,7 +18,7 @@ public class IndividualTextPanel extends JPanel {
 		JPanel p1 = new JPanel();
 		p1.setLayout(new GridLayout(1,1));
 		textArea = new JTextArea();
-		textArea.setPreferredSize(new Dimension(500, 500));
+		textArea.setPreferredSize(new Dimension(500, 2000));
 		JScrollPane scroll1 = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, 
 	        	JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		scroll1.setViewportView(textArea);

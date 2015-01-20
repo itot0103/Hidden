@@ -24,6 +24,18 @@ public class OneIndividual {
 	}
 	
 	
+	public void setNumericValue(int id, double v) {
+		numeric[id] = v;
+	}
+	
+	public void setCategoryValue(int id, String v) {
+		category[id] = v;
+	}
+	
+	public void setBooleanValue(int id, boolean v) {
+		bool[id] = v;
+	}
+	
 	public double[] getNumericValues() {
 		return numeric;
 	}

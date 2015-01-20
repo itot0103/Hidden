@@ -8,6 +8,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import java.util.*;
+import java.lang.Thread.UncaughtExceptionHandler;
 
 import ocha.itolab.hidden.applet.numdim.CursorListener.IndividualWheelThread;
 import ocha.itolab.hidden.core.data.*;
@@ -119,10 +120,11 @@ public class DimensionSelectionPanel extends JPanel {
 	}
 
 	static long now1 = 0, now2 = 0;
-	
+	CatchException catchException = new CatchException();
 	
 	class SliderListener implements ChangeListener {
 		public void stateChanged(ChangeEvent e) {
+			
 			JSlider sliderChanged = (JSlider) e.getSource();
 			if (sliderChanged == slider1) {
 				if(ps == null) return;
@@ -131,15 +133,17 @@ public class DimensionSelectionPanel extends JPanel {
 				now1 = now;
 				
 				Slider1Thread st1 = new Slider1Thread(now);
+				st1.setUncaughtExceptionHandler(catchException);
 				st1.start();
 			}
-			if (sliderChanged == slider1) {
+			if (sliderChanged == slider2) {
 				if(ps == null) return;
 				
 				long now = System.currentTimeMillis();
 				now2 = now;
 				
 				Slider2Thread st2 = new Slider2Thread(now);
+				st2.setUncaughtExceptionHandler(catchException);
 				st2.start();
 			}
 		}
@@ -214,6 +218,13 @@ public class DimensionSelectionPanel extends JPanel {
 			}	
 			
          }
+	}
+
+	class CatchException implements UncaughtExceptionHandler {
+		public void uncaughtException(Thread t, Throwable e) {
+			System.out.println(t.getName());
+			icanvas.unlockDisplay();
+		}
 	}
 
 	

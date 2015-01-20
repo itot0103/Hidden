@@ -106,6 +106,9 @@ public class IndividualDrawer implements GLEventListener {
 		dpcp.setTransparency(t);
 	}
 	
+	public void unlockDisplay() {
+		//dpcp.unlockDisplay();
+	}
 	
 	public void setIndividualSet(IndividualSet p) {
 		ps = p;
