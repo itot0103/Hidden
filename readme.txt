@@ -1,7 +1,7 @@
 Hidden (HIgh-Dimensional Data Exploration and Navigation)
 by Takayuki Itoh (Ochanomizu University, Japan, E-mail:itot(at)is.ocha.ac.jp)
 
-Implementation of graph visualization technique published as follows:
+Implementation of high-dimensional data visualization technique published as follows:
 T. Itoh, A. Kumar, K. Klein, J. Kim, High-Dimensional Data Visualization by Interactive Construction of Low-Dimensional Parallel Coordinate Plots, Journal of Visual Languages and Computing, Vol. 43, pp. 1-13, 2017.
 
 Running on Java 1.8 or newer, mdsj.jar, and JOGL (Java binging OpenGL) 2.2.
